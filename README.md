@@ -1,4 +1,4 @@
-# Singapore Mental Health Service Navigator
+# Project Lintel: A Mental Health Service Navigator
 
 A **non-clinical service router** for Singapore’s mental health ecosystem. Help-seekers describe their situation in free text; a deterministic [LangGraph](https://langchain-ai.github.io/langgraph/) engine maps constraints to the [National Tiered Care Model](https://www.moh.gov.sg/newsroom/launch-of-national-mental-health-and-well-being-strategy/) (Tiers 1–4) and returns a traceable provider pathway—not therapy, diagnosis, or CBT.
 
