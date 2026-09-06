@@ -1,0 +1,122 @@
+# --- Personal / private artefacts ---
+Project_Plan.pdf
+Singapore_Mental_Health_Navigator_Project_Plan.pdf
+
+# --- Secrets & local config ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+credentials.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Type checkers / linters
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.ruff_cache/
+.pyre/
+
+# --- pytest / coverage / eval ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.nox/
+nosetests.xml
+eval/results/
+eval/outputs/
+eval/reports/
+eval/*.jsonl
+!eval/README.md
+
+# --- FastAPI / Uvicorn ---
+*.pid
+*.log
+logs/
+uvicorn.log
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+.streamlit/secrets.toml.local
+~/.streamlit/
+.streamlit/cache/
+
+# --- LangGraph / LangChain / OpenAI ---
+.langgraph_api/
+.langgraph.json.local
+checkpoints/
+*.checkpoint
+.langchain.db
+langsmith/
+.langsmith/
+openai_cache/
+
+# --- ChromaDB / RAG persist (keep source JSON, not vectors) ---
+chroma/
+.chroma/
+chroma_db/
+chromadb/
+**/chroma.sqlite3
+**/chroma.sqlite3-*
+.cache/
+huggingface/
+onnxruntime/
+
+# --- SQLite / local relational state ---
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Editors / IDEs ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.code-workspace
