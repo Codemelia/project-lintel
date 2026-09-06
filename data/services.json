@@ -1,0 +1,185 @@
+[
+    {
+        "service_id": "sg-sos-01",
+        "name": "Samaritans of Singapore (SOS)",
+        "tier_labels": ["4"],
+        "category": "Crisis Support & Hotlines",
+        "age_min": 0,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Anyone in Singapore experiencing active suicidal ideation, severe acute distress, or immediate emotional crisis"
+        ],
+        "cost_model": "Free",
+        "urgency_level": "emergency",
+        "summary": "24/7 confidential emergency crisis support, suicide prevention hotline, and text messaging service.",
+        "access_pathway": "Call 1767 immediately or message SOS CareText via WhatsApp at 9151 1767.",
+        "contact": {
+            "website": "https://www.sos.org.sg",
+            "phone": "1767",
+            "operating_hours": "24/7",
+            "location_type": "Online/Tele-health"
+        },
+        "is_hard_stop_only": true
+    },
+    {
+        "service_id": "sg-imh-emergency-01",
+        "name": "Institute of Mental Health (IMH) Emergency Services",
+        "tier_labels": ["4"],
+        "category": "Specialist & Acute Care (IMH/Hospitals)",
+        "age_min": 0,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Individuals experiencing severe psychiatric emergencies, acute psychosis, severe distress, or immediate risk of harm to self or others"
+        ],
+        "cost_model": "Subsidized",
+        "urgency_level": "emergency",
+        "summary": "24/7 psychiatric emergency department providing immediate medical and clinical stabilization.",
+        "access_pathway": "Call the 24-hour Mental Health Helpline at 6389 2222 or proceed directly to the IMH Emergency Room at Buangkok Green Medical Park.",
+        "contact": {
+            "website": "https://www.imh.com.sg",
+            "phone": "63892222",
+            "operating_hours": "24/7",
+            "location_type": "Polyclinic/Hospital"
+        },
+        "is_hard_stop_only": true
+    },
+    {
+        "service_id": "sg-mindline-01",
+        "name": "National Mindline (1771)",
+        "tier_labels": ["1"],
+        "category": "Crisis Support & Hotlines",
+        "age_min": 0,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Anyone seeking a listening ear, basic emotional support, or early-stage mental well-being navigation in Singapore"
+        ],
+        "cost_model": "Free",
+        "urgency_level": "routine",
+        "summary": "National 24/7 helpline providing immediate non-clinical emotional support, listening ear services, and mental health navigation.",
+        "access_pathway": "Call 1771 to speak directly with an emotional support counselor or access self-assessment tools online.",
+        "contact": {
+            "website": "https://www.mindline.sg",
+            "phone": "1771",
+            "operating_hours": "24/7",
+            "location_type": "Online/Tele-health"
+        },
+        "is_hard_stop_only": false
+    },
+    {
+        "service_id": "sg-chat-01",
+        "name": "CHAT (Community Health Assessment Team)",
+        "tier_labels": ["1", "2"],
+        "category": "Youth Assessment & Navigation",
+        "age_min": 16,
+        "age_max": 30,
+        "eligibility_criteria": [
+            "Youths and young adults in Singapore aged 16–30",
+            "Experiencing early signs of emotional distress or mental health concerns",
+            "Not currently in acute crisis requiring immediate hospitalization"
+        ],
+        "cost_model": "Free",
+        "urgency_level": "routine",
+        "summary": "Free, confidential mental health assessment and triage service tailored specifically for youth and young adults.",
+        "access_pathway": "Self-refer online via the CHAT website to schedule a free confidential assessment at Scape or via video call.",
+        "contact": {
+            "website": "https://www.chat.mentalhealth.sg",
+            "phone": "64936500",
+            "operating_hours": "Tue-Sat: 12:00 PM - 9:00 PM",
+            "location_type": "Walk-in"
+        },
+        "is_hard_stop_only": false
+    },
+    {
+        "service_id": "sg-polyclinic-telepsych-01",
+        "name": "Polyclinic Primary Care & Tele-Psychology",
+        "tier_labels": ["2"],
+        "category": "Primary Care & Polyclinics",
+        "age_min": 7,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Singapore Citizens and Permanent Residents seeking primary care mental health support",
+            "Experiencing mild-to-moderate anxiety, depression, or stress-related symptoms"
+        ],
+        "cost_model": "Subsidized",
+        "urgency_level": "routine",
+        "summary": "Subsidized primary mental healthcare including consultation with a Family Physician, tele-psychology services, and subsidized medication.",
+        "access_pathway": "Book a General Practitioner (GP) appointment at any SingHealth or NHGP Polyclinic for a primary health evaluation and referral.",
+        "contact": {
+            "website": "https://www.healthhub.sg",
+            "phone": "63553000",
+            "operating_hours": "Mon-Fri: 8:00 AM - 4:30 PM, Sat: 8:00 AM - 12:30 PM",
+            "location_type": "Polyclinic/Hospital"
+        },
+        "is_hard_stop_only": false
+    },
+    {
+        "service_id": "sg-fsc-01",
+        "name": "Family Service Centres (FSCs)",
+        "tier_labels": ["2"],
+        "category": "Community Support & Assessment (CREST)",
+        "age_min": 0,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Singapore residents facing family difficulties, financial stress, interpersonal conflict, or social distress",
+            "Requires localized community social support and casework"
+        ],
+        "cost_model": "Subsidized",
+        "urgency_level": "routine",
+        "summary": "Community-based social work centers providing family counseling, social casework, and holistic community support.",
+        "access_pathway": "Locate and walk into the nearest regional Family Service Centre based on your residential Postal Code via Social Service Net.",
+        "contact": {
+            "website": "https://www.msf.gov.sg/dfsc",
+            "phone": "18002220000",
+            "operating_hours": "Mon-Fri: 8:30 AM - 5:30 PM",
+            "location_type": "Community Center"
+        },
+        "is_hard_stop_only": false
+    },
+    {
+        "service_id": "sg-crest-01",
+        "name": "CREST (Community Resource Engagement and Support Team)",
+        "tier_labels": ["1", "2"],
+        "category": "Community Support & Assessment (CREST)",
+        "age_min": 18,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Singapore residents aged 18 and above",
+            "Adults or seniors at risk of or experiencing mental health conditions or dementia",
+            "Caregivers seeking navigation for community mental health resources"
+        ],
+        "cost_model": "Free",
+        "urgency_level": "routine",
+        "summary": "Community outreach teams offering mental health screening, basic emotional support, and active service linking for adults and seniors.",
+        "access_pathway": "Contact the Agency for Integrated Care (AIC) hotline or connect directly with regional CREST outreach workers in your neighborhood.",
+        "contact": {
+            "website": "https://www.aic.sg/body-mind/mental-health",
+            "phone": "18006506060",
+            "operating_hours": "Mon-Fri: 8:30 AM - 5:30 PM",
+            "location_type": "Mobile/Outreach"
+        },
+        "is_hard_stop_only": false
+    },
+    {
+        "service_id": "sg-private-counseling-01",
+        "name": "Private Counseling & Psychotherapy Outlets",
+        "tier_labels": ["3"],
+        "category": "Community Counseling & Therapy (COMIT)",
+        "age_min": 5,
+        "age_max": 120,
+        "eligibility_criteria": [
+            "Individuals seeking immediate access to specialized, highly customized therapy without public sector wait times",
+            "Possesses private insurance, company coverage, or personal budget for self-funded care"
+        ],
+        "cost_model": "Private",
+        "urgency_level": "sub-acute",
+        "summary": "Direct-access private clinical psychology and psychotherapy practices offering rapid booking and customized therapy modalities.",
+        "access_pathway": "Self-refer directly online via licensed private clinic portals (e.g., SAC / SPS registered private practitioners) to book immediate appointments.",
+        "contact": {
+            "website": "https://singaporepsychologicalsociety.org",
+            "phone": null,
+            "operating_hours": "Varies by practice",
+            "location_type": "Walk-in"
+        },
+        "is_hard_stop_only": false
+    }
+]

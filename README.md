@@ -1,6 +1,6 @@
 # Project Lintel: A Mental Health Service Navigator
 
-A **non-clinical service router** for Singapore’s mental health ecosystem. Help-seekers describe their situation in free text; a deterministic [LangGraph](https://langchain-ai.github.io/langgraph/) engine maps constraints to the [National Tiered Care Model](https://www.moh.gov.sg/newsroom/launch-of-national-mental-health-and-well-being-strategy/) (Tiers 1–4) and returns a traceable provider pathway—not therapy, diagnosis, or CBT.
+A **public-facing, non-clinical service navigator chatbot** for Singapore’s mental health ecosystem. Help-seekers describe their situation in free text; a deterministic [LangGraph](https://langchain-ai.github.io/langgraph/) engine maps constraints to the [National Tiered Care Model](https://www.moh.gov.sg/newsroom/launch-of-national-mental-health-and-well-being-strategy/) (Tiers 1–4) and returns a traceable provider pathway—not therapy, diagnosis, or CBT.
 
 Scope, architecture, and milestones are in [`docs/project-plan.md`](./docs/project-plan.md). Process topology, API contracts, and diagrams: [`docs/system-design.md`](./docs/system-design.md).
 
@@ -33,17 +33,17 @@ The result: functional silos, decision fatigue, and weak measurability of routin
 
 ## What this system does
 
-The Navigator is a **transparent preparation assistant and service router**:
+The Navigator is a **chatbot that routes, not treats**: a transparent preparation assistant and service router behind a chat UI.
 
-1. **Intent & Scope Gate** — regex plus structured LLM classification. Crisis or out-of-scope requests (diagnosis, CBT therapy) never enter conversational generation.
-2. **Parameter extraction** — age, budget tier (`Free` / `Subsidized` / `Private`), urgency, and primary need from free text.
+1. **Intent & Scope Gate** — first-person crisis regex, then `gpt-4o-mini` structured JSON (`in_scope` / `crisis` / `out_of_scope`). Crisis or out-of-scope requests (diagnosis, CBT therapy) never enter conversational generation.
+2. **Parameter extraction** — age, `cost_model` (`Free` / `Subsidized` / `Private` / `Variable`), `urgency_level`, and `category` from free text (same OpenAI client).
 3. **Tier mapping** — rule-based assignment to Tiers 1–4.
-4. **Hard-filtered RAG** — metadata filters on curated Singapore providers **before** vector search.
-5. **Explainable recommendation** — user-facing pathway plus a live decision trace (intent, active node, citations).
+4. **Hard-filtered RAG** — metadata filters on curated Singapore providers **before** vector search (`age_min`/`age_max`, `cost_model`, `is_hard_stop_only=false`). Embeddings stay on MiniLM locally.
+5. **Explainable recommendation** — templated pathway plus a live decision trace (intent, active node, citations, `model_backend` / `egress`).
 
 Strategic focus is borrowed from front-door e-triage (for example UK NHS evaluations of Limbic Access): reduce clinician assessment burden by allocating pathways, not by acting as a therapist. Liability is bounded by refusing unconstrained therapeutic bots.
 
-Measurable engineering KPIs: **Scope Adherence Rate**, **Routing Precision / Navigation Accuracy**, and **Safety Hand-off Success**. Full definitions are in the [evaluation section of the project plan](./docs/project-plan.md#5-evaluation-strategy--kpis).
+Measurable engineering KPIs: **Scope Adherence Rate**, **Service Routing Accuracy**, **Safety Hand-off Success**, and **Trace Transparency**. Full definitions are in the [evaluation section of the project plan](./docs/project-plan.md#5-evaluation-strategy-and-kpis).
 
 ## Policy frame
 
@@ -61,50 +61,51 @@ Official public directory: [MOH — Mental health services](https://www.moh.gov.
 
 ## Architecture
 
-Modular Python stack, low latency, high transparency for evaluation. **Diagrams, HTTP contracts, store split, and control-flow predicates:** [`docs/system-design.md`](./docs/system-design.md).
+Modular Python stack. Chat UI is Streamlit; routing and models live in FastAPI. **Diagrams, HTTP contracts, store split, and control-flow predicates:** [`docs/system-design.md`](./docs/system-design.md).
 
 | Layer | Technology | Role |
 |-------|------------|------|
-| Frontend | [Streamlit](https://streamlit.io/) | Dual column: chat (left) and live reasoning trace (right) |
+| Frontend | [Streamlit](https://streamlit.io/) | Dual column: chatbot (left) and live reasoning trace (right) |
 | Backend | [FastAPI](https://fastapi.tiangolo.com/) + Uvicorn | REST orchestration, [Pydantic](https://docs.pydantic.dev/) validation |
-| State engine | [LangGraph](https://langchain-ai.github.io/langgraph/) | Deterministic graph: Intent Gate → RAG → Hard Stop / Response Generator |
-| Storage / RAG | SQLite + [ChromaDB](https://www.trychroma.com/) | Local vectors + relational state; curated provider metadata |
+| State engine | [LangGraph](https://langchain-ai.github.io/langgraph/) + `app/graph/models.py` | Deterministic graph; models fill fields, Python chooses edges |
+| Intent / extract | `gpt-4o-mini` structured JSON (`OPENAI_BASE_URL` optional) | Slot-filling only; not unconstrained therapy |
+| Storage / RAG | SQLite + [ChromaDB](https://www.trychroma.com/) + MiniLM | Local catalogue vectors; curated provider metadata |
 
 **Graph nodes** (predicates and sequence diagrams in [system design](./docs/system-design.md); node roles in the [project plan](./docs/project-plan.md#3-langgraph-engine-architecture)):
 
-1. Intent & Safety Gate (hybrid regex + `gpt-4o-mini`)
-2. Parameter Extraction
-3. National Tier Mapping
+1. Intent & Safety Gate (regex → `gpt-4o-mini` if no regex match)
+2. Parameter Extraction (`get_node_model("extract")`)
+3. National Tier Mapping (rules, no generative model)
 4. Metadata hard-filter + RAG
-5. Decision & Explanation
+5. Decision & Explanation (templated pathway)
 6. Safety Fallback & Boundary (hardcoded emergency contacts)
 
 Conditional edges prevent unconstrained LLM loops. Crisis / out-of-scope paths skip generation entirely.
 
 ## Knowledge base
 
-Eight primary providers spanning Tiers 1–4, stored as structured documents (planned path: [`data/services.json`](./data/README.md)) and ingested into ChromaDB via [`rag/`](./rag/README.md).
+Eight primary providers spanning Tiers 1–4 in [`data/services.json`](./data/services.json) ([schema](./data/schemas/services.schema.json)). Ingest into ChromaDB via [`rag/`](./rag/README.md) (upsert by `service_id`; flatten nested `contact`; exclude `is_hard_stop_only` from Node 4).
 
-| Tier | Provider | Routing criteria |
-|------|----------|------------------|
-| 4 Acute | SOS (1767) | `is_crisis = True` → hard stop |
-| 4 Acute | IMH Emergency (6389 2222) | `is_crisis = True` → hard stop |
-| 1 General | national mindline (1771) | Sub-acute / free / 24/7 |
-| 1–2 Youth | CHAT | Age 16–30 / free assessment |
-| 2 Primary | Polyclinics (tele-psychology) | Subsidized / GP referral |
-| 2 Community | Family Service Centres | Means-tested / community location |
-| 2 Community | CREST teams | Age 18+ / outreach |
-| 3 Specialized | Private counselling | Higher budget / rapid booking |
+| `service_id` | Tiers | Provider | Routing |
+|--------------|-------|----------|---------|
+| `sg-sos-01` | 4 | SOS (1767) | `is_crisis` → hard stop |
+| `sg-imh-emergency-01` | 4 | IMH Emergency (`6389 2222`) | `is_crisis` → hard stop |
+| `sg-mindline-01` | 1 | National Mindline (1771) | Free / 24/7 listening ear |
+| `sg-chat-01` | 1–2 | CHAT | Age 16–30 / free assessment |
+| `sg-polyclinic-telepsych-01` | 2 | Polyclinic tele-psychology | Subsidized / GP referral |
+| `sg-fsc-01` | 2 | Family Service Centres | Subsidized / community casework |
+| `sg-crest-01` | 1–2 | CREST | Age 18+ / outreach |
+| `sg-private-counseling-01` | 3 | Private counselling | `Private` / rapid booking |
 
 ## Evaluation targets
 
-Benchmark: **30** synthetic queries (15 in-scope navigation, 8 acute crisis, 7 out-of-scope). Compare this Navigator against unconstrained **GPT-4o-mini** (no state routing). Pipeline: [`eval/`](./eval/README.md).
+Benchmark: **30** synthetic queries (15 in-scope navigation, 8 acute crisis, 7 out-of-scope). Compare **two** configurations: unconstrained `gpt-4o-mini` (baseline) vs Navigator chatbot. Pipeline: [`eval/`](./eval/README.md).
 
 | Metric | Target | Method |
 |--------|--------|--------|
 | Safety Hand-off Success | **100%** | Crisis cases must hard-stop to emergency contacts; no conversational generation |
 | Scope Adherence Rate | **> 90%** | Out-of-scope (CBT / diagnosis) refused and redirected to non-clinical navigation |
-| Service Routing Accuracy | **> 85%** | Age, budget, and urgency match the eligible provider in `services.json` |
+| Service Routing Accuracy | **> 85%** | Age, `cost_model`, and `urgency_level` match the eligible `service_id` in `services.json` |
 | Trace Transparency | **100%** | Every output fills the right-hand panel with RAG citations and router metadata |
 
 ## Repository layout
@@ -115,15 +116,16 @@ Folder layout matches Step 1 of the [project plan](./docs/project-plan.md#4-phas
 .
 ├── README.md                                          # This file
 ├── requirements.txt                                   # Python dependencies
+├── .env.example                                       # Env template (copy to .env)
 ├── docs/                                              # Design & planning docs
 │   ├── README.md
 │   ├── project-plan.md
 │   └── system-design.md
-├── app/                                               # FastAPI + LangGraph
-├── ui/                                                # Streamlit dual-panel UI
+├── app/                                               # FastAPI + LangGraph + OpenAI client
+├── ui/                                                # Streamlit dual-panel chatbot
 ├── rag/                                               # ChromaDB ingest & retrieval
-├── data/                                              # services.json knowledge base
-├── eval/                                              # eval.py + 30-case benchmark
+├── data/                                              # services.json + schemas/
+├── eval/                                              # eval.py + 30-case two-config benchmark
 └── tests/                                             # pytest (node + payload tests)
 ```
 
@@ -131,22 +133,22 @@ Folder layout matches Step 1 of the [project plan](./docs/project-plan.md#4-phas
 
 **Core:** Python, FastAPI, Streamlit, LangGraph, ChromaDB, Pydantic, SQLite, Uvicorn, pytest.
 
-**LLM:** `gpt-4o-mini` for intent classification and structured extraction (not for unconstrained therapy).
+**Models:** `gpt-4o-mini` for intent and extraction (JSON only). Catalogue embeddings: local `all-MiniLM-L6-v2`. Node 5–6 never generate therapy.
 
 ## Getting started
 
 Environment setup is **Step 1**. Python **3.11–3.13** is recommended. After cloning:
 
 ```bash
-python -m venv .venv
+python -m venv venv
 # Windows
-.venv\Scripts\activate
+venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Set `OPENAI_API_KEY` in the environment (or a local `.env`) before running the Intent Gate.
+Copy [`.env.example`](./.env.example) to `.env` at the **repo root** (gitignored). Set `OPENAI_API_KEY`. Optional `OPENAI_BASE_URL` for a private/regional OpenAI-compatible endpoint. Streamlit needs `NAVIGATOR_API_URL` only.
 
-Planned local run:
+Planned local run (public hosting is later; same API contract):
 
 | Surface | URL |
 |---------|-----|
@@ -161,9 +163,9 @@ Full step list: [project plan §4](./docs/project-plan.md#4-phased-milestone-pla
 
 | Phase | Steps | Focus |
 |-------|-------|--------|
-| 1 | 1–5 | Layout, `services.json`, GraphState, LangGraph, FastAPI + tests |
-| 1 | 6–7 | Streamlit dual-panel UI |
-| 2 | 8–10 | 30-case eval set + `eval.py` vs baseline |
+| 1 | 1–5 | Layout, `services.json`, GraphState, OpenAI client, LangGraph, FastAPI + tests |
+| 1 | 6–7 | Streamlit dual-panel chatbot |
+| 2 | 8–10 | 30-case eval set + two-config `eval.py` |
 | 2 | 11–14 | Latency / safety fallbacks, demo, dry run, deck freeze |
 
 ## If you need help now

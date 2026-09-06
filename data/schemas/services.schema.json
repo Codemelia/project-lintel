@@ -1,0 +1,131 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "LintelServiceCatalog",
+    "description": "Schema for Singapore Mental Health Services. Source JSON uses a nested contact object; ingest flattens contact fields for ChromaDB metadata.",
+    "type": "array",
+    "minItems": 8,
+    "maxItems": 8,
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "service_id",
+            "name",
+            "tier_labels",
+            "category",
+            "age_min",
+            "age_max",
+            "eligibility_criteria",
+            "cost_model",
+            "urgency_level",
+            "summary",
+            "access_pathway",
+            "contact",
+            "is_hard_stop_only"
+        ],
+        "properties": {
+            "service_id": {
+                "type": "string",
+                "pattern": "^sg-[a-z0-9-]+$",
+                "description": "Unique string ID used for exact database citation traces in LangGraph."
+            },
+            "name": {
+                "type": "string",
+                "description": "Official name of the service provider or program."
+            },
+            "tier_labels": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["1", "2", "3", "4"]
+                },
+                "minItems": 1,
+                "uniqueItems": true,
+                "description": "Singapore National Tiered Care Model levels."
+            },
+            "category": {
+                "type": "string",
+                "enum": [
+                    "Crisis Support & Hotlines",
+                    "Youth Assessment & Navigation",
+                    "Community Support & Assessment (CREST)",
+                    "Community Counseling & Therapy (COMIT)",
+                    "Primary Care & Polyclinics",
+                    "Specialist & Acute Care (IMH/Hospitals)"
+                ],
+                "description": "Categorical domain for metadata filtering."
+            },
+            "age_min": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 120,
+                "description": "Minimum age threshold (inclusive)."
+            },
+            "age_max": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 120,
+                "description": "Maximum age threshold (inclusive)."
+            },
+            "eligibility_criteria": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1,
+                "description": "List of explicit qualifying criteria."
+            },
+            "cost_model": {
+                "type": "string",
+                "enum": ["Free", "Subsidized", "Private", "Variable"],
+                "description": "Cost classification for eligibility filtering."
+            },
+            "urgency_level": {
+                "type": "string",
+                "enum": ["routine", "sub-acute", "acute", "emergency"],
+                "description": "Determines triage priority."
+            },
+            "summary": {
+                "type": "string",
+                "maxLength": 300,
+                "description": "Concise non-clinical overview."
+            },
+            "access_pathway": {
+                "type": "string",
+                "description": "Step-by-step instructions on accessing the service."
+            },
+            "contact": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["website", "phone", "operating_hours", "location_type"],
+                "description": "How to reach the service. Flatten to scalars on Chroma upsert.",
+                "properties": {
+                    "website": {
+                        "type": ["string", "null"],
+                        "description": "Official public URL, or null if none."
+                    },
+                    "phone": {
+                        "type": ["string", "null"],
+                        "description": "Public phone or hotline digits, or null if none."
+                    },
+                    "operating_hours": {
+                        "type": ["string", "null"],
+                        "description": "Human-readable hours, or null if unknown."
+                    },
+                    "location_type": {
+                        "type": "string",
+                        "enum": [
+                            "Online/Tele-health",
+                            "Walk-in",
+                            "Community Center",
+                            "Polyclinic/Hospital",
+                            "Mobile/Outreach"
+                        ]
+                    }
+                }
+            },
+            "is_hard_stop_only": {
+                "type": "boolean",
+                "description": "True if surfaced only during acute crisis interception."
+            }
+        }
+    }
+}
